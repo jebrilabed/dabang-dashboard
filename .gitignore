@@ -1,0 +1,15 @@
+# dependencies
+/node_modules
+
+# production
+/build
+
+# environment variables
+.env
+
+# windows
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
