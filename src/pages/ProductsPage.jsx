@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
-import { Search, LayoutGrid, List, Star, Plus, Package } from 'lucide-react'
+import { Search, LayoutGrid, List, Star, Plus, Package, X } from 'lucide-react'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { productsData, productCategoryData } from '../data/mockData'
+import { productsData as initialProductsData, productCategoryData } from '../data/mockData'
 
 const CATEGORY_COLORS = ['#6C5CE7','#00B894','#FDCB6E','#FD79A8','#0984E3','#A29BFE','#00CEC9','#E17055']
 
@@ -15,7 +15,7 @@ const StockBadge = ({ status }) => (
   <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${stockConfig[status]}`}>{status}</span>
 )
 
-const categories = ['All', ...new Set(productsData.map(p => p.category))]
+const categories = ['All', ...new Set(initialProductsData.map(p => p.category))]
 
 const ProductCard = ({ product }) => (
   <div className="card hover:shadow-card-hover transition-shadow duration-200 flex flex-col">
@@ -63,10 +63,73 @@ const ProductRow = ({ product }) => (
   </tr>
 )
 
+const AddProductModal = ({ onClose, onAdd }) => {
+  const [form, setForm] = useState({ name: '', category: 'Home', price: '', stock: '' })
+  
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    onAdd({
+      id: `P${Math.floor(Math.random() * 10000)}`,
+      name: form.name,
+      category: form.category,
+      price: parseFloat(form.price) || 0,
+      stock: parseInt(form.stock) || 0,
+      sold: 0,
+      rating: 0,
+      status: parseInt(form.stock) > 0 ? 'In Stock' : 'Out of Stock',
+      image: '📦'
+    })
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl p-6 w-full max-w-md animate-fade-in-up">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-gray-800">Add New Product</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={20}/></button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Name</label>
+            <input required value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30" />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Category</label>
+            <select value={form.category} onChange={e => setForm({...form, category: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white">
+              {['Electronics','Home','Kids','Sports','Beauty','Kitchen','Bath','Garden'].map(c => <option key={c}>{c}</option>)}
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Price</label>
+              <input type="number" step="0.01" required value={form.price} onChange={e => setForm({...form, price: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Stock</label>
+              <input type="number" required value={form.stock} onChange={e => setForm({...form, stock: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+          </div>
+          <div className="flex gap-3 pt-4">
+            <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-gray-200 font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
+            <button type="submit" className="flex-1 py-2.5 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-colors">Add Product</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 const ProductsPage = () => {
+  const [productsData, setProductsData] = useState(initialProductsData)
   const [view, setView]         = useState('grid')
   const [search, setSearch]     = useState('')
   const [category, setCategory] = useState('All')
+  const [showModal, setShowModal] = useState(false)
+
+  const handleAddProduct = (newProduct) => {
+    setProductsData(prev => [newProduct, ...prev])
+  }
 
   const filtered = useMemo(() => {
     return productsData.filter(p => {
@@ -74,10 +137,11 @@ const ProductsPage = () => {
       const matchCat = category === 'All' || p.category === category
       return matchSearch && matchCat
     })
-  }, [search, category])
+  }, [search, category, productsData])
 
   return (
     <div className="p-4 md:p-6 space-y-5">
+      {showModal && <AddProductModal onClose={() => setShowModal(false)} onAdd={handleAddProduct} />}
       {/* Summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in-up stagger-1">
         {[
@@ -140,7 +204,7 @@ const ProductsPage = () => {
                 <List size={16} />
               </button>
             </div>
-            <button className="flex items-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-primary/90 transition-colors whitespace-nowrap">
+            <button onClick={() => setShowModal(true)} className="flex items-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-primary/90 transition-colors whitespace-nowrap">
               <Plus size={15} /> Add Product
             </button>
           </div>

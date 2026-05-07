@@ -1,8 +1,13 @@
 import React, { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { Search, Bell, ChevronDown, Menu, X } from 'lucide-react'
 
 const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
   const [search, setSearch] = useState('')
+  const location = useLocation()
+  
+  const path = location.pathname.substring(1) || 'dashboard'
+  const title = path.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 
   return (
     <header className="sticky top-0 z-10 bg-white border-b border-gray-100 px-4 md:px-6 py-3.5 flex items-center justify-between gap-4 shadow-sm">
@@ -15,7 +20,7 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
           {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
         <h1 className="font-display text-xl font-bold text-gray-900 hidden sm:block">
-          Dashboard
+          {title}
         </h1>
       </div>
 

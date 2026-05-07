@@ -3,14 +3,37 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-primary-rgb: 108 92 231;
+  }
+  
   * {
     box-sizing: border-box;
   }
 
   body {
-    @apply bg-gray-50 text-gray-800 font-sans;
+    @apply bg-gray-50 text-gray-800 font-sans transition-colors duration-200;
     margin: 0;
     padding: 0;
+  }
+
+  .dark body {
+    @apply bg-gray-900 text-gray-100;
+  }
+  .dark .bg-white {
+    @apply !bg-gray-800;
+  }
+  .dark .bg-gray-50 {
+    @apply !bg-gray-900;
+  }
+  .dark .text-gray-800, .dark .text-gray-900, .dark .text-gray-700 {
+    @apply !text-gray-100;
+  }
+  .dark .border-gray-100, .dark .border-gray-200 {
+    @apply !border-gray-700;
+  }
+  .dark .text-gray-500 {
+    @apply !text-gray-400;
   }
 
   ::-webkit-scrollbar {

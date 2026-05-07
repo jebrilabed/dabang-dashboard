@@ -1,4 +1,5 @@
 import React from 'react'
+import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard,
   BarChart2,
@@ -33,20 +34,21 @@ const navLinks = [
   { id: 'sign-out', label: 'Sign Out', icon: 'log-out' },
 ]
 
-const NavItem = ({ link, active, onClick }) => {
+const NavItem = ({ link, onClick }) => {
   const Icon = iconMap[link.icon]
   return (
-    <button
-      onClick={() => onClick(link.id)}
-      className={`nav-item w-full text-left ${active ? 'active' : ''}`}
+    <NavLink
+      to={`/${link.id}`}
+      onClick={onClick}
+      className={({ isActive }) => `nav-item w-full text-left ${isActive ? 'active' : ''}`}
     >
       <Icon size={18} />
       <span>{link.label}</span>
-    </button>
+    </NavLink>
   )
 }
 
-const Sidebar = ({ activeNav, onNavChange, isOpen, onClose }) => {
+const Sidebar = ({ isOpen, onClose }) => {
   return (
     <>
       {/* Mobile overlay */}
@@ -81,8 +83,7 @@ const Sidebar = ({ activeNav, onNavChange, isOpen, onClose }) => {
             <NavItem
               key={link.id}
               link={link}
-              active={activeNav === link.id}
-              onClick={onNavChange}
+              onClick={onClose}
             />
           ))}
         </nav>

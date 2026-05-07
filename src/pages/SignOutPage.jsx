@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { LogOut, Zap, ArrowLeft } from 'lucide-react'
 
-const SignOutPage = ({ onNavigate }) => {
+const SignOutPage = () => {
   const [confirmed, setConfirmed] = useState(false)
+  const navigate = useNavigate()
 
   if (confirmed) {
     return (
@@ -13,7 +15,7 @@ const SignOutPage = ({ onNavigate }) => {
         <h2 className="font-display text-2xl font-bold text-gray-800 mb-2">You've been signed out</h2>
         <p className="text-sm text-gray-400 mb-6 max-w-xs">Your session has ended. Sign back in to access your dashboard.</p>
         <button
-          onClick={() => { setConfirmed(false); onNavigate('dashboard') }}
+          onClick={() => { setConfirmed(false); navigate('/dashboard') }}
           className="flex items-center gap-2 bg-primary text-white font-semibold text-sm px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors"
         >
           <ArrowLeft size={15} /> Back to Dashboard
@@ -39,7 +41,7 @@ const SignOutPage = ({ onNavigate }) => {
             Yes, Sign Me Out
           </button>
           <button
-            onClick={() => onNavigate('dashboard')}
+            onClick={() => navigate('/dashboard')}
             className="w-full bg-gray-100 text-gray-600 font-semibold text-sm py-3 rounded-xl hover:bg-gray-200 transition-colors"
           >
             Cancel

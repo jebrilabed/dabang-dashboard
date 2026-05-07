@@ -198,11 +198,7 @@ const SecurityTab = () => {
   )
 }
 
-const AppearanceTab = () => {
-  const [theme, setTheme]   = useState('light')
-  const [accent, setAccent] = useState('#6C5CE7')
-  const [density, setDensity] = useState('comfortable')
-
+const AppearanceTab = ({ theme, setTheme, accent, setAccent, density, setDensity }) => {
   const accents = ['#6C5CE7','#0984E3','#00B894','#FD79A8','#E17055','#FDCB6E']
 
   return (
@@ -248,15 +244,34 @@ const AppearanceTab = () => {
   )
 }
 
-const tabContent = {
-  profile: <ProfileTab />,
-  notifications: <NotificationsTab />,
-  security: <SecurityTab />,
-  appearance: <AppearanceTab />,
-}
-
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState('profile')
+  const [theme, setTheme] = useState(localStorage.getItem('app_theme') || 'light')
+  const [accent, setAccent] = useState(localStorage.getItem('app_accent') || '#6C5CE7')
+  const [density, setDensity] = useState('comfortable')
+
+  const handleSave = () => {
+    localStorage.setItem('app_theme', theme)
+    localStorage.setItem('app_accent', accent)
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+    const hexToRgb = (hex) => {
+      const bigint = parseInt(hex.slice(1), 16)
+      return `${(bigint >> 16) & 255} ${(bigint >> 8) & 255} ${bigint & 255}`
+    }
+    document.documentElement.style.setProperty('--color-primary-rgb', hexToRgb(accent))
+    alert('Settings saved and applied successfully!')
+  }
+
+  const tabContent = {
+    profile: <ProfileTab />,
+    notifications: <NotificationsTab />,
+    security: <SecurityTab />,
+    appearance: <AppearanceTab theme={theme} setTheme={setTheme} accent={accent} setAccent={setAccent} density={density} setDensity={setDensity} />,
+  }
 
   return (
     <div className="p-4 md:p-6">
@@ -288,7 +303,7 @@ const SettingsPage = () => {
             <button className="px-5 py-2.5 text-sm font-semibold text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
               Cancel
             </button>
-            <button className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors">
+            <button onClick={handleSave} className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors">
               <Save size={14} /> Save Changes
             </button>
           </div>

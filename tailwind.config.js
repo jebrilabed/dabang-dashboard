@@ -1,10 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
       colors: {
-        primary: '#6C5CE7',
+        primary: 'rgb(var(--color-primary-rgb) / <alpha-value>)',
         'primary-light': '#A29BFE',
         sidebar: '#F8F8FB',
         card: '#FFFFFF',

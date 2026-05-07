@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Sidebar from './components/layout/Sidebar'
 import Navbar from './components/layout/Navbar'
 import DashboardPage    from './pages/DashboardPage'
@@ -9,36 +10,30 @@ import SalesReportPage  from './pages/SalesReportPage'
 import MessagesPage     from './pages/MessagesPage'
 import SettingsPage     from './pages/SettingsPage'
 import SignOutPage      from './pages/SignOutPage'
-import useActiveNav     from './hooks/useActiveNav'
 
 const App = () => {
-  const { activeNav, handleNavChange } = useActiveNav('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const handleNavSelect = (id) => {
-    handleNavChange(id)
-    setSidebarOpen(false)
-  }
-
-  const renderPage = () => {
-    switch (activeNav) {
-      case 'dashboard':    return <DashboardPage />
-      case 'leaderboard':  return <LeaderboardPage />
-      case 'order':        return <OrderPage />
-      case 'products':     return <ProductsPage />
-      case 'sales-report': return <SalesReportPage />
-      case 'messages':     return <MessagesPage />
-      case 'settings':     return <SettingsPage />
-      case 'sign-out':     return <SignOutPage onNavigate={handleNavSelect} />
-      default:             return <DashboardPage />
+  useEffect(() => {
+    const theme = localStorage.getItem('app_theme') || 'light'
+    const accent = localStorage.getItem('app_accent') || '#6C5CE7'
+    
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
     }
-  }
+
+    const hexToRgb = (hex) => {
+      const bigint = parseInt(hex.slice(1), 16)
+      return `${(bigint >> 16) & 255} ${(bigint >> 8) & 255} ${bigint & 255}`
+    }
+    document.documentElement.style.setProperty('--color-primary-rgb', hexToRgb(accent))
+  }, [])
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
       <Sidebar
-        activeNav={activeNav}
-        onNavChange={handleNavSelect}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
@@ -48,7 +43,18 @@ const App = () => {
           isSidebarOpen={sidebarOpen}
         />
         <main className="flex-1 overflow-y-auto">
-          {renderPage()}
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/leaderboard" element={<LeaderboardPage />} />
+            <Route path="/order" element={<OrderPage />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/sales-report" element={<SalesReportPage />} />
+            <Route path="/messages" element={<MessagesPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/sign-out" element={<SignOutPage />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
         </main>
       </div>
     </div>
